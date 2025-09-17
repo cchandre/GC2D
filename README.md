@@ -14,4 +14,16 @@ nohup python3 -u run_gc2ds.py &>gc2d.out < /dev/null &
 ```
 The list of Python packages and their version are specified in [`requirements.txt`](https://github.com/cchandre/GC2D/blob/main/requirements.txt)
 ___
-##  Parameter dictionary
+####  Main parameters
+
+- *A*: Amplitude of the electrostatic potential
+- *M*: Number of modes in the electrostatic potential
+- *seed*: Seed for the random phases of the electrostatic potential (optional; default=27)
+
+#### Main functions
+
+
+---
+Reference: 
+
+For more information: <cristel.chandre@cnrs.fr>
