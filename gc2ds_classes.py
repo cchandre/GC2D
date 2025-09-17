@@ -26,8 +26,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as xp
-from scipy.integrate._ivp.ivp import METHODS as IVP_METHODS
-from scipy.integrate import solve_ivp
 from pyhamsys import HamSys
 import matplotlib.pyplot as plt
 import os
@@ -95,27 +93,6 @@ class GC2Ds(HamSys):
 		J21_dot = J11 * d2phi[0] + J21 * d2phi[1]
 		J22_dot = J12 * d2phi[0] + J22 * d2phi[1]
 		return xp.concatenate((z_dot, J11_dot, J12_dot, J21_dot, J22_dot), axis=None)
-	
-	def compute_lyapunov(self, tf, z0, reortho_dt, tol=1e-8, solver='RK45'):
-		if solver not in IVP_METHODS:
-			raise ValueError(f"Solver {solver} is not recognized for Lyapunov exponent computation."
-							 f"Available solvers are {IVP_METHODS}.")
-		start = time.time()
-		n = len(z0) // 2
-		lyap_sum = xp.zeros((2, n), dtype=xp.float64)
-		t, z = 0, xp.concatenate((z0, xp.ones(n), xp.zeros(n), xp.zeros(n), xp.ones(n)), axis=None)
-		for _ in range(int(tf / reortho_dt)):
-			sol = solve_ivp(self.y_dot_lyap, (t, t + reortho_dt), z, method=solver, t_eval=[t + reortho_dt], atol=tol, rtol=tol)
-			z, Q = sol.y[:2 * n, -1], xp.moveaxis(sol.y[2 * n:, -1].reshape((2, 2, n)), -1, 0)
-			for i in range(n):
-				q, r = xp.linalg.qr(Q[i])
-				lyap_sum[:, i] += xp.log(xp.abs(xp.diag(r)))
-				Q[i] = q
-			t += reortho_dt
-			z = xp.concatenate((z, xp.moveaxis(Q, 0, -1)), axis=None)
-		print(f'\033[90m        Computation finished in {int(time.time() - start)} seconds \033[00m')
-		lyap_sort = xp.sort(lyap_sum / tf)
-		return lyap_sort
 	
 	def wrap(self, xi, yi):
 		return xp.asarray(xi) % (2 * xp.pi), xp.asarray(yi) % (2 * xp.pi)
