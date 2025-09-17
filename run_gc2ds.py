@@ -1,16 +1,15 @@
 ###################################################################################################
-##                      Parameters: https://github.com/cchandre/GC2D_intranet                    ##
+##                      Parameters: https://github.com/cchandre/GC2D                             ##
 ###################################################################################################
 
 import numpy as xp
 import multiprocessing as mp
 from gc2ds_classes import GC2Ds
 
-# potential
+## Parameters
 A = 0.6
 M = 25
 
-# parameters
 Ntraj = 500
 n_max = 500
 
@@ -22,18 +21,20 @@ default_omega = 10
 solver = 'BM4'  
 
 parameters = {"A": A, "M": M}
+
 hs = GC2Ds(parameters)
 z0 = hs.initial_conditions(Ntraj, type="random")
 
 t_eval = 2 * xp.pi * xp.arange(n_max)
 
-#lyap = hs.compute_lyapunov(2 * xp.pi * n_max, z0, reortho_dt=1, tol=1e-10, solver='RK45')
-#print(lyap)
+## Computation of the Lyapunov exponent
+# lyap = hs.compute_lyapunov(2 * xp.pi * n_max, z0, reortho_dt=1, tol=1e-10, solver='RK45')
+# print(lyap)
 
-# Plot of the Poincaré section
-#sol = hs.integrate(z0, t_eval, timestep=5e-2, solver='BM4', extension=True)
-#hs.plot_sol(sol, wrap=True)
-#hs.plot_sol(sol)
+## Plot of the Poincaré section
+# sol = hs.integrate(z0, t_eval, timestep=default_time_step, solver=solver, extension=True)
+# hs.plot_sol(sol, wrap=True)
+# hs.plot_sol(sol)
 
 parameters.update({"Ntraj": Ntraj, "n_max": n_max, "solver": solver})
 
