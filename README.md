@@ -45,9 +45,9 @@ In addition, GC2Ds has the following key methods:
 
 - `potential`: Potential value at time t and position z=(x, y).
 
-- `hamiltonian`: Total Hamiltonian (sum of potential).
+- `hamiltonian`: Total Hamiltonian (sum of the potentials for each trajectory).
 
-- `y_dot_lyap`: Extended system for Lyapunov-exponent calculations.
+- `y_dot_lyap`: Extended system (equations of motion and tangent flow) for Lyapunov-exponent calculations.
 
 - `plot_sol`: Quick 2-D plot of a solution trajectory.
 
