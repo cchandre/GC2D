@@ -76,12 +76,12 @@ class GC2Ds(HamSys):
 		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(z, 2)) - t))
 		return xp.sum(xp.einsum('jk,jk...->...', self.phic, exp_xy).real)
 	
-	def potential(self, t, y):
-		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(y, 2)) - t))
+	def potential(self, t, z):
+		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(z, 2)) - t))
 		return xp.einsum('jk,jk...->...', self.phic, exp_xy).imag
 	
-	def hamiltonian(self, t, y):
-		return xp.sum(self.potential(t, y))
+	def hamiltonian(self, t, z):
+		return xp.sum(self.potential(t, z))
 	
 	def y_dot_lyap(self, t, z):
 		x, y, J11, J12, J21, J22 = xp.split(z, 6)
