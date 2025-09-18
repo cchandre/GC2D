@@ -49,7 +49,7 @@ In addition, GC2Ds has the following key methods:
 
 - `y_dot_lyap`: Extended system (equations of motion and tangent flow) for Lyapunov-exponent calculations.
 
-- `plot_sol`: Quick 2-D plot of a solution trajectory.
+- `plot_sol`: 2-D plot of a solution obtained by the function `integrate`.
 
 - `save_data`: Save simulation results to a `.mat` file with metadata.
 
