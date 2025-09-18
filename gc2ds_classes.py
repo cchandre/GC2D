@@ -30,8 +30,6 @@ from pyhamsys import HamSys
 import matplotlib.pyplot as plt
 import os
 import time
-from datetime import datetime
-from scipy.io import savemat
 
 class GC2Ds(HamSys):
 	def __str__(self) -> str:
@@ -94,13 +92,10 @@ class GC2Ds(HamSys):
 		J22_dot = J12 * d2phi[0] + J22 * d2phi[1]
 		return xp.concatenate((z_dot, J11_dot, J12_dot, J21_dot, J22_dot), axis=None)
 	
-	def wrap(self, xi, yi):
-		return xp.asarray(xi) % (2 * xp.pi), xp.asarray(yi) % (2 * xp.pi)
-	
 	def plot_sol(self, sol, wrap=False): 
 		x, y = xp.split(sol.y, 2)
 		if wrap:
-			x, y = self.wrap(x, y)
+			x, y = xp.asarray(x) % (2 * xp.pi), xp.asarray(y) % (2 * xp.pi)
 		plt.plot(x, y, '.', color='blue')
 		plt.xlabel('x')
 		plt.ylabel('y')
@@ -108,10 +103,3 @@ class GC2Ds(HamSys):
 			plt.xlim(0, 2 * xp.pi)
 			plt.ylim(0, 2 * xp.pi)
 		plt.show()
-
-	def save_data(self, data, params):
-		params.update({'data': data})
-		params.update({'date': datetime.now().strftime(" %B %d, %Y\n"), 'author': 'cristel.chandre@cnrs.fr'})
-		filename = params["mode"] + '_' + datetime.now().strftime("%Y%m%d_%H%M%S") + '.mat'
-		savemat(filename, params)
-		print(f'\033[90m        Results saved in {filename} \033[00m')
