@@ -27,7 +27,31 @@ gc = GC2Ds(params)
 z0 = gc.initial_conditions(100, type="random")
 ```
 
-### Main functions and attributes
+### Key methods
+
+Since GC2Ds is s subclass of HamSys (from the python package [`pyhamsys`](https://pypi.org/project/pyhamsys/)), it inherits all its methods, including:
+
+- `integrate`: Integrate numerically the trajectories of the system defined by the element of the class GC2Ds from the initial conditions defined by the function `initial_conditions`. 
+
+- `compute_lyapunov`: Compute the Lyapunov spectrum. 
+
+In addition, GC2Ds has the following key methods:
+
+- `initial_conditions`: Generate starting (x, y) positions—random or on a regular grid.
+
+- `y_dot`: Time derivative of positions for integration.
+
+- `k_dot`: Scalar diagnostic of the potential field.
+
+- `potential`: Potential value at time t and position z=(x, y).
+
+- `hamiltonian`: Total Hamiltonian (sum of potential).
+
+- `y_dot_lyap`: Extended system for Lyapunov-exponent calculations.
+
+- `plot_sol`: Quick 2-D plot of a solution trajectory.
+
+- `save_data`: Save simulation results to a `.mat` file with metadata.
 
 #### `initial_conditions`
 
