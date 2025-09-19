@@ -18,7 +18,9 @@ ___
 
 - *A*: Amplitude of the electrostatic potential
 - *M*: Number of modes in the electrostatic potential
-- *seed*: Seed for the random phases of the electrostatic potential (optional; default=27)
+- *seed*: Seed for the random phases $\phi_{nm}$ of the electrostatic potential (optional; default=27)
+
+$$ V(x,y,t) =\sum_{n, m=1}^M \frac{A}{(n^2+m^2)^{3/2}} {\rm e}^{i(n x+my +\phi_{nm} -t) } $$
 
 #### Example 
 ```python
@@ -33,7 +35,9 @@ Since GC2Ds is s subclass of HamSys (from the python package [`pyhamsys`](https:
 
 - `integrate`: Integrate numerically the trajectories of the system defined by the element of the class GC2Ds from the initial conditions defined by the function `initial_conditions`. 
 
-- `compute_lyapunov`: Compute the Lyapunov spectrum. 
+- `compute_lyapunov`: Compute the Lyapunov spectrum.
+
+- `save_data`: Save simulation results to a `.mat` file with metadata.
 
 In addition, GC2Ds has the following key methods:
 
@@ -50,8 +54,6 @@ In addition, GC2Ds has the following key methods:
 - `y_dot_lyap`: Extended system (equations of motion and tangent flow) for Lyapunov-exponent calculations.
 
 - `plot_sol`: 2-D plot of a solution obtained by the function `integrate`.
-
-- `save_data`: Save simulation results to a `.mat` file with metadata.
 
 #### `initial_conditions`
 
