@@ -43,7 +43,7 @@ In addition, GC2Ds has the following key methods:
 
 - `k_dot`: Scalar diagnostic of the potential field.
 
-- `potential`: Potential value at time t and position z=(x, y).
+- `potential`: Potential value at time t and position z=(x, y), and its first and second derivatives, obtained by specifying (*dx*, *dy*).
 
 - `hamiltonian`: Total Hamiltonian (sum of the potentials for each trajectory).
 
