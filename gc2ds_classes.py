@@ -74,9 +74,21 @@ class GC2Ds(HamSys):
 		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(z, 2)) - t))
 		return xp.sum(xp.einsum('jk,jk...->...', self.phic, exp_xy).real)
 	
-	def potential(self, t, z):
+	def potential(self, t, z, dx=0, dy=0):
 		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(z, 2)) - t))
-		return xp.einsum('jk,jk...->...', self.phic, exp_xy).imag
+		cases = {
+			(0, 0): (self.phic, 'imag'),
+			(1, 0): (self.d1phic[1], 'real'),
+			(0, 1): (-self.d1phic[0], 'real'),
+			(2, 0): (self.d2phic[0], 'imag'),
+			(1, 1): (self.d2phic[1], 'imag'),
+			(0, 2): (self.d2phic[2], 'imag'),
+		}
+		coeff, part = cases.get((dx, dy), (None, None))
+		if coeff is None:
+			raise ValueError("Only first and second derivatives are implemented")
+		result = xp.einsum('ijk,jk...->...', coeff, exp_xy)
+		return getattr(result, part)
 	
 	def hamiltonian(self, t, z):
 		return xp.sum(self.potential(t, z))
