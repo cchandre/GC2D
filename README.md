@@ -71,11 +71,9 @@ initial_conditions(
 
 #### Parameters
 
--   **n_traj**: Number of points. For `"fixed"`, rounded to a perfect
-    square for a square grid.\
--   **x**, **y**: (min, max) ranges; default `(0, 2π)`.\
--   **type**: `"random"` for uniform random samples, `"fixed"` for a
-    regular grid.\
+-   **n_traj**: Number of points. For `"fixed"`, rounded to a perfect square for a square grid.
+-   **x**, **y**: (min, max) ranges; default `(0, 2π)`.
+-   **type**: `"random"` for uniform random samples, `"fixed"` for a regular grid.
 -   **seed**: Random seed when `type="random"`.
 
 #### Returns
