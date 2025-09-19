@@ -54,7 +54,7 @@ def run_one(param):
     om = param if mode == 'omega' else default_omega 
     sol = gc.integrate(z0, t_eval, timestep=step, omega=om, display=False, solver=solver, extension=True, check_energy=True)
     print(f"{mode} = {param:.3e}   error = {sol.err / Ntraj}  dist_copy = {sol.dist_copy}  CPU_time = {int(sol.cpu_time)}s")
-    return (sol.step, sol.err / Ntraj, sol.dist_copy, sol.cpu_time)
+    return (sol.step, om, sol.err / Ntraj, sol.dist_copy, sol.cpu_time)
 
 if __name__ == '__main__':
     with mp.Pool(processes=n_process) as pool:
