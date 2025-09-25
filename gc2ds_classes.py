@@ -87,7 +87,7 @@ class GC2Ds(HamSys):
 		coeff, part = cases.get((dx, dy), (None, None))
 		if coeff is None:
 			raise ValueError("Only first and second derivatives are implemented")
-		result = xp.einsum('ijk,jk...->...', coeff, exp_xy)
+		result = xp.einsum('jk,jk...->...', coeff, exp_xy)
 		return getattr(result, part)
 	
 	def hamiltonian(self, t, z):
