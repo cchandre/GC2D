@@ -46,7 +46,7 @@ class GC2Ds(HamSys):
 		self.phic[1:, 1:] = self.A / (self.nm[0][1:, 1:]**2 + self.nm[1][1:, 1:]**2)**1.5 * np.exp(1j * self.phases)
 		sqrt_nm = np.sqrt(self.nm[0]**2 + self.nm[1]**2)
 		self.phic[sqrt_nm > self.M] = 0
-		self.d1phic = np.asarray([-self.nm[1] * self.phic, self.nm[0] * self.phic])
+		self.d1phic = np.asarray([self.nm[0] * self.phic, self.nm[1] * self.phic])
 		self.d2phic = np.asarray([-self.nm[0]**2 * self.phic, -self.nm[0] * self.nm[1] * self.phic,
 							  -self.nm[1]**2 * self.phic])
 
@@ -67,7 +67,8 @@ class GC2Ds(HamSys):
 	
 	def y_dot(self, t, z):
 		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
-		return (np.einsum('ijk,jk...->i...', self.d1phic, exp_xy).real).reshape(z.shape)
+		d1phi = np.einsum('ijk,jk...->i...', self.d1phic, exp_xy).real
+		return np.concatenate((-d1phi[1], d1phi[0]), axis=None)
 	
 	def k_dot(self, t, z):
 		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
@@ -77,12 +78,11 @@ class GC2Ds(HamSys):
 		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
 		cases = {
 			(0, 0): (self.phic, 'imag'),
-			(1, 0): (self.d1phic[1], 'real'),
-			(0, 1): (-self.d1phic[0], 'real'),
+			(1, 0): (self.d1phic[0], 'real'),
+			(0, 1): (self.d1phic[1], 'real'),
 			(2, 0): (self.d2phic[0], 'imag'),
 			(1, 1): (self.d2phic[1], 'imag'),
-			(0, 2): (self.d2phic[2], 'imag'),
-		}
+			(0, 2): (self.d2phic[2], 'imag')}
 		coeff, part = cases.get((dx, dy), (None, None))
 		if coeff is None:
 			raise ValueError("Only first and second derivatives are implemented")
