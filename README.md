@@ -59,18 +59,6 @@ In addition, GC2Ds has the following key methods:
 
 Generate initial 2-D coordinates for trajectories on a periodic domain.
 
-#### Usage
-
-``` python
-initial_conditions(
-    n_traj: int = 1,
-    x: tuple[float, float] | None = None,
-    y: tuple[float, float] | None = None,
-    type: str = "fixed",
-    seed: int | None = None
-) -> xp.ndarray
-```
-
 #### Parameters
 
 -   **n_traj**: Number of points. For `"fixed"`, rounded to a perfect square for a square grid.
@@ -91,6 +79,18 @@ z0 = gc.initial_conditions(100, x=(0, np.pi), y=(0, np.pi), type="fixed")
 
 
 ---
-Reference: 
+Reference: F. Mauger, C. Chandre, *Extended phase-space symplectic integration for electron dynamics* (2025)
+
+```bibtex
+@article{GC2Ds,
+  title = {Extended phase-space symplectic integration for electron dynamics},
+  author = {François Mauger and Cristel Chandre},
+  journal = {},
+  volume = {},
+  pages = {},
+  year = {2025},
+  doi = {},
+}
+```
 
 For more information: <cristel.chandre@cnrs.fr>
