@@ -2,13 +2,13 @@
 
 - [`gc2ds_classes.py`](https://github.com/cchandre/GC2D/blob/main/gc2ds_classes.py): contains the GC classes and main functions defining the GC dynamics
 
-- [`run_gc2ds.py`](https://github.com/cchandre/GC2D/blob/main/run_gc2ds.py): example of a run file to reproduce the computations done in [REF]
+- [`run_gc2ds.py`](https://github.com/cchandre/GC2D/blob/main/run_gc2ds.py): example of a run file to reproduce the computations done in [[Mauger, Chandre (2025)]()]
 
 Once [`run_gc2ds.py`](https://github.com/cchandre/GC2D/blob/main/run_gc2ds.py) has been edited with the relevant parameters, run the file as 
 ```sh
 python3 run_gc2ds.py
 ```
-or 
+or in batch mode
 ```sh
 nohup python3 -u run_gc2ds.py &>gc2d.out < /dev/null &
 ```
@@ -26,7 +26,6 @@ $$ V(x,y,t) =\sum_{n, m=1}^M \frac{A}{(n^2+m^2)^{3/2}} {\rm e}^{i(n x+my +\phi_{
 ```python
 params = {"A": 1.0, "M": 16, "seed": 42}
 gc = GC2Ds(params)
-z0 = gc.initial_conditions(100, type="random")
 ```
 
 ### Key methods
@@ -41,19 +40,19 @@ Since GC2Ds is s subclass of HamSys (from the python package [`pyhamsys`](https:
 
 In addition, GC2Ds has the following key methods:
 
-- `initial_conditions`: Generate starting (x, y) positions—random or on a regular grid.
+- `initial_conditions`: Generate starting (*x*, *y*) positions—random or on a regular grid.
 
 - `y_dot`: Time derivative of positions for integration.
 
 - `k_dot`: Scalar diagnostic of the potential field.
 
-- `potential`: Potential value at time t and position z=(x, y), and its first and second derivatives, obtained by specifying (*dx*, *dy*).
+- `potential`: Potential value at time t and position *z*=(*x*, *y*), and its first and second derivatives, obtained by specifying (*dx*, *dy*).
 
 - `hamiltonian`: Total Hamiltonian (sum of the potentials for each trajectory).
 
 - `y_dot_lyap`: Extended system (equations of motion and tangent flow) for Lyapunov-exponent calculations.
 
-- `plot_sol`: 2-D plot of a solution obtained by the function `integrate`.
+- `plot_sol`: 2-D plot of a solution obtained by the function `integrate` (for Poincaré sections).
 
 #### `initial_conditions`
 
