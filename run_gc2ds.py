@@ -2,7 +2,7 @@
 ##                      Parameters: https://github.com/cchandre/GC2D                             ##
 ###################################################################################################
 
-import numpy as xp
+import numpy as np
 import multiprocessing as mp
 from gc2ds_classes import GC2Ds
 
@@ -25,10 +25,10 @@ parameters = {"A": A, "M": M}
 gc = GC2Ds(parameters)
 z0 = gc.initial_conditions(Ntraj, kind="random")
 
-t_eval = 2 * xp.pi * xp.arange(n_max)
+t_eval = 2 * np.pi * np.arange(n_max)
 
 ## Computation of the Lyapunov exponent
-# lyap = gc.compute_lyapunov(2 * xp.pi * n_max, z0, reortho_dt=1, tol=1e-10, solver='RK45')
+# lyap = gc.compute_lyapunov(2 * np.pi * n_max, z0, reortho_dt=1, tol=1e-10, solver='RK45')
 # print(lyap)
 
 ## Plot of the Poincaré section
@@ -41,10 +41,10 @@ gc.plot_sol(sol, wrap=True)
 # mode = 'omega'
 
 # if mode == 'omega':
-#     param_list = xp.logspace(-2, 2, n_data)  
+#     param_list = np.logspace(-2, 2, n_data)  
 #     parameters.update({"mode": mode, "omega": param_list, "timestep": default_time_step})
 # elif mode == 'step':
-#     param_list = xp.logspace(-2, 0, n_data)[::-1]  
+#     param_list = np.logspace(-2, 0, n_data)[::-1]  
 #     parameters.update({"mode": mode, "omega": default_omega, "timestep": param_list})
 # else:
 #     raise ValueError("Mode must be 'omega' or 'step'")
