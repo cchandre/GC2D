@@ -50,21 +50,20 @@ class GC2Ds(HamSys):
 		self.d2phic = np.asarray([-self.nm[0]**2 * self.phic, -self.nm[0] * self.nm[1] * self.phic,
 							  -self.nm[1]**2 * self.phic])
 
-	def initial_conditions(self, n_traj=1, x=None, y=None, type='fixed', seed=None):
+	def initial_conditions(self, n_traj=1, x=None, y=None, kind='fixed', seed=None):
 		x, y = (0, 2 * np.pi) if x is None else x, (0, 2 * np.pi) if y is None else y
-		if type == 'random':
+		if kind == 'random':
 			seed = seed if seed is not None else int(time.time()) + os.getpid()
 			rng = np.random.default_rng(seed)
-			x0 = (x[-1] - x[0]) * rng.random(n_traj) + x[0]
-			y0 = (y[-1] - y[0]) * rng.random(n_traj) + y[0]
-			z0 = np.concatenate((x0, y0), axis=None)
-		elif type == 'fixed':
-			n_traj = int(np.sqrt(n_traj))**2
-			x0 = np.linspace(x[0], x[-1], int(np.sqrt(n_traj)), endpoint=False)
-			y0 = np.linspace(y[0], y[-1], int(np.sqrt(n_traj)), endpoint=False)
+			x0, y0 = rng.uniform(x[0], x[-1], n_traj), rng.uniform(y[0], y[-1], n_traj)
+		elif kind == 'fixed':
+			n_side = int(np.sqrt(n_traj))
+			x0 = np.linspace(x[0], x[-1], n_side, endpoint=False)
+			y0 = np.linspace(y[0], y[-1], n_side, endpoint=False)
 			x0, y0 = np.meshgrid(x0, y0, indexing='ij')
-			z0 = np.concatenate((x0.flatten(), y0.flatten()), axis=None)
-		return z0
+		else:
+			raise ValueError("Invalid 'kind' argument. Must be 'fixed' or 'random'.")
+		return np.concatenate((x0.ravel(), y0.ravel()), axis=None)
 	
 	def y_dot(self, t, z):
 		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
