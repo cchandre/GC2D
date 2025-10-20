@@ -25,7 +25,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import numpy as xp
+import numpy as np
 from pyhamsys import HamSys
 import matplotlib.pyplot as plt
 import os
@@ -39,43 +39,43 @@ class GC2Ds(HamSys):
 		super().__init__(ndof=1.5)
 		self.A, self.M = params["A"], params["M"]
 		seed = params["seed"] if "seed" in params else 27
-		xp.random.seed(seed)
-		self.phases = 2 * xp.pi * xp.random.random((self.M, self.M))
-		self.nm = xp.meshgrid(xp.arange(self.M+1), xp.arange(self.M+1), indexing='ij')
-		self.phic = xp.zeros((self.M+1, self.M+1), dtype=xp.complex128)
-		self.phic[1:, 1:] = self.A / (self.nm[0][1:, 1:]**2 + self.nm[1][1:, 1:]**2)**1.5 * xp.exp(1j * self.phases)
-		sqrt_nm = xp.sqrt(self.nm[0]**2 + self.nm[1]**2)
+		np.random.seed(seed)
+		self.phases = 2 * np.pi * np.random.random((self.M, self.M))
+		self.nm = np.meshgrid(np.arange(self.M+1), np.arange(self.M+1), indexing='ij')
+		self.phic = np.zeros((self.M+1, self.M+1), dtype=np.complex128)
+		self.phic[1:, 1:] = self.A / (self.nm[0][1:, 1:]**2 + self.nm[1][1:, 1:]**2)**1.5 * np.exp(1j * self.phases)
+		sqrt_nm = np.sqrt(self.nm[0]**2 + self.nm[1]**2)
 		self.phic[sqrt_nm > self.M] = 0
-		self.d1phic = xp.asarray([-self.nm[1] * self.phic, self.nm[0] * self.phic])	
-		self.d2phic = xp.asarray([-self.nm[0]**2 * self.phic, -self.nm[0] * self.nm[1] * self.phic,\
+		self.d1phic = np.asarray([-self.nm[1] * self.phic, self.nm[0] * self.phic])
+		self.d2phic = np.asarray([-self.nm[0]**2 * self.phic, -self.nm[0] * self.nm[1] * self.phic,
 							  -self.nm[1]**2 * self.phic])
 
 	def initial_conditions(self, n_traj=1, x=None, y=None, type='fixed', seed=None):
-		x, y = (0, 2 * xp.pi) if x is None else x, (0, 2 * xp.pi) if y is None else y
+		x, y = (0, 2 * np.pi) if x is None else x, (0, 2 * np.pi) if y is None else y
 		if type == 'random':
 			seed = seed if seed is not None else int(time.time()) + os.getpid()
-			rng = xp.random.default_rng(seed)
+			rng = np.random.default_rng(seed)
 			x0 = (x[-1] - x[0]) * rng.random(n_traj) + x[0]
 			y0 = (y[-1] - y[0]) * rng.random(n_traj) + y[0]
-			z0 = xp.concatenate((x0, y0), axis=None)
+			z0 = np.concatenate((x0, y0), axis=None)
 		elif type == 'fixed':
-			n_traj = int(xp.sqrt(n_traj))**2
-			x0 = xp.linspace(x[0], x[-1], int(xp.sqrt(n_traj)), endpoint=False)
-			y0 = xp.linspace(y[0], y[-1], int(xp.sqrt(n_traj)), endpoint=False)
-			x0, y0 = xp.meshgrid(x0, y0, indexing='ij')
-			z0 = xp.concatenate((x0.flatten(), y0.flatten()), axis=None)
+			n_traj = int(np.sqrt(n_traj))**2
+			x0 = np.linspace(x[0], x[-1], int(np.sqrt(n_traj)), endpoint=False)
+			y0 = np.linspace(y[0], y[-1], int(np.sqrt(n_traj)), endpoint=False)
+			x0, y0 = np.meshgrid(x0, y0, indexing='ij')
+			z0 = np.concatenate((x0.flatten(), y0.flatten()), axis=None)
 		return z0
 	
 	def y_dot(self, t, z):
-		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(z, 2)) - t))
-		return (xp.einsum('ijk,jk...->i...', self.d1phic, exp_xy).real).reshape(z.shape)
+		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
+		return (np.einsum('ijk,jk...->i...', self.d1phic, exp_xy).real).reshape(z.shape)
 	
 	def k_dot(self, t, z):
-		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(z, 2)) - t))
-		return xp.sum(xp.einsum('jk,jk...->...', self.phic, exp_xy).real)
-	
+		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
+		return np.sum(np.einsum('jk,jk...->...', self.phic, exp_xy).real)
+
 	def potential(self, t, z, dx=0, dy=0):
-		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, xp.split(z, 2)) - t))
+		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
 		cases = {
 			(0, 0): (self.phic, 'imag'),
 			(1, 0): (self.d1phic[1], 'real'),
@@ -87,31 +87,30 @@ class GC2Ds(HamSys):
 		coeff, part = cases.get((dx, dy), (None, None))
 		if coeff is None:
 			raise ValueError("Only first and second derivatives are implemented")
-		result = xp.einsum('jk,jk...->...', coeff, exp_xy)
+		result = np.einsum('jk,jk...->...', coeff, exp_xy)
 		return getattr(result, part)
 	
 	def hamiltonian(self, t, z):
-		return xp.sum(self.potential(t, z))
-	
+		return np.sum(self.potential(t, z))
+
 	def y_dot_lyap(self, t, z):
-		x, y, J11, J12, J21, J22 = xp.split(z, 6)
-		z_dot = self.y_dot(t, xp.concatenate((x, y), axis=None))
-		exp_xy = xp.exp(1j * (xp.einsum('ijk,i...->jk...', self.nm, (x, y)) - t))
-		d2phi = xp.einsum('ijk,jk...->i...', self.d2phic, exp_xy).imag
-		J11_dot = -J11 * d2phi[1] - J21 * d2phi[2]
-		J12_dot = -J12 * d2phi[1] - J22 * d2phi[2]
-		J21_dot = J11 * d2phi[0] + J21 * d2phi[1]
-		J22_dot = J12 * d2phi[0] + J22 * d2phi[1]
-		return xp.concatenate((z_dot, J11_dot, J12_dot, J21_dot, J22_dot), axis=None)
+		x, y, *J = np.split(z, 6)
+		z_dot = self.y_dot(t, np.concatenate((x, y), axis=None))
+		J = np.array(J).reshape((2, 2, -1))
+		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, (x, y)) - t))
+		d2phi = np.einsum('ijk,jk...->i...', self.d2phic, exp_xy).imag
+		A = np.array([[-d2phi[1], -d2phi[2]], [d2phi[0], d2phi[1]]])
+		J_dot = np.einsum('ijm,jkm->ikm', A, J)
+		return np.concatenate((z_dot, J_dot.reshape(-1)), axis=None)
 	
 	def plot_sol(self, sol, wrap=False): 
-		x, y = xp.split(sol.y, 2)
+		x, y = np.split(sol.y, 2)
 		if wrap:
-			x, y = xp.asarray(x) % (2 * xp.pi), xp.asarray(y) % (2 * xp.pi)
-		plt.plot(x, y, '.', color='blue')
+			x, y = np.asarray(x) % (2 * np.pi), np.asarray(y) % (2 * np.pi)
+		plt.plot(x.T, y.T, '.')
 		plt.xlabel('x')
 		plt.ylabel('y')
 		if wrap:
-			plt.xlim(0, 2 * xp.pi)
-			plt.ylim(0, 2 * xp.pi)
+			plt.xlim(0, 2 * np.pi)
+			plt.ylim(0, 2 * np.pi)
 		plt.show()
