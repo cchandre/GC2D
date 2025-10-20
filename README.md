@@ -1,4 +1,4 @@
-# Guiding-Center dynamics in plasma physics
+# Guiding-center dynamics in plasma physics
 
 - [`gc2ds_classes.py`](https://github.com/cchandre/GC2D/blob/main/gc2ds_classes.py): contains the GC classes and main functions defining the GC dynamics
 
