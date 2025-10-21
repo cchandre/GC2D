@@ -10,7 +10,7 @@ from gc2ds_classes import GC2Ds
 A = 0.6
 M = 25
 
-Ntraj = 500
+Ntraj = 20
 n_max = 500
 
 n_data = 200
@@ -32,7 +32,7 @@ t_eval = 2 * np.pi * np.arange(n_max)
 # print(lyap)
 
 ## Plot of the Poincaré section
-sol = gc.integrate(z0, t_eval, timestep=default_time_step, solver=solver, extension=True)
+sol = gc.integrate(z0, t_eval, timestep=default_time_step, solver=solver, omega=default_omega, extension=True)
 gc.plot_sol(sol, wrap=True)
 # gc.plot_sol(sol)
 

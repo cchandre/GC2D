@@ -65,17 +65,20 @@ class GC2Ds(HamSys):
 			raise ValueError("Invalid 'kind' argument. Must be 'fixed' or 'random'.")
 		return np.concatenate((x0.ravel(), y0.ravel()), axis=None)
 	
+	def compute_exp(self, t, z):
+		return np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2), optimize=True) - t))
+
 	def y_dot(self, t, z):
-		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
+		exp_xy = self.compute_exp(t, z)
 		d1phi = np.einsum('ijk,jk...->i...', self.d1phic, exp_xy).real
 		return np.concatenate((-d1phi[1], d1phi[0]), axis=None)
 	
 	def k_dot(self, t, z):
-		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
+		exp_xy = self.compute_exp(t, z)
 		return np.sum(np.einsum('jk,jk...->...', self.phic, exp_xy).real)
 
 	def potential(self, t, z, dx=0, dy=0):
-		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2)) - t))
+		exp_xy = self.compute_exp(t, z)
 		cases = {
 			(0, 0): (self.phic, 'imag'),
 			(1, 0): (self.d1phic[0], 'real'),
@@ -94,9 +97,10 @@ class GC2Ds(HamSys):
 
 	def y_dot_lyap(self, t, z):
 		x, y, *J = np.split(z, 6)
-		z_dot = self.y_dot(t, np.concatenate((x, y), axis=None))
+		z = np.concatenate((x, y), axis=None)
+		z_dot = self.y_dot(t, z)
 		J = np.array(J).reshape((2, 2, -1))
-		exp_xy = np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, (x, y)) - t))
+		exp_xy = self.compute_exp(t, z)
 		d2phi = np.einsum('ijk,jk...->i...', self.d2phic, exp_xy).imag
 		A = np.array([[-d2phi[1], -d2phi[2]], [d2phi[0], d2phi[1]]])
 		J_dot = np.einsum('ijm,jkm->ikm', A, J)
