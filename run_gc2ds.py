@@ -14,11 +14,11 @@ Ntraj = 500
 n_max = 500
 
 n_data = 200
-n_process = 8
+n_process = 100
 
 default_time_step = 0.1
-default_omega = 10
-solver = 'BM4'  
+solver = 'BM4'
+default_omega = None
 projection = 'midpoint'
 
 parameters = {"A": A, "M": M}
@@ -39,7 +39,7 @@ t_eval = 2 * np.pi * np.arange(n_max)
 
 # parameters.update({"Ntraj": Ntraj, "n_max": n_max, "solver": solver})
 
-mode = 'omega'
+mode = 'step'
 
 if mode == 'omega':
     param_list = np.logspace(-2, 2, n_data)  
