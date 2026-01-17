@@ -4,6 +4,7 @@
 
 import numpy as np
 import multiprocessing as mp
+import csv
 from gc2ds_classes import GC2Ds
 
 ## Parameters
@@ -58,8 +59,16 @@ def run_one(param):
     return (sol.step, om, sol.err / Ntraj, sol.cpu_time, sol.projection, sol.proj_dist)
 
 if __name__ == '__main__':
+    output_file = f"{mode}_results.csv"
+    results = []
+    headers = ['step', 'omega', 'error', 'cpu_time', 'projection', 'proj_dist']
     with mp.Pool(processes=n_process) as pool:
-        results = pool.map(run_one, param_list)
-
+        with open(output_file, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(headers)
+            for result in pool.imap_unordered(run_one, param_list):
+                results.append(result)
+                writer.writerow(result)
+                csvfile.flush()
     sorted_results = sorted(results, key=lambda pair: pair[0])
     gc.save_data(sorted_results, params=parameters, filename=mode, author='cristel.chandre@cnrs.fr')
