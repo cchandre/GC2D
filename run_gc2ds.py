@@ -20,7 +20,7 @@ n_process = 100
 default_time_step = 0.1
 solver = 'BM4'
 default_omega = None
-projection = 'symmetric'
+projection = 'midpoint'
 
 parameters = {"A": A, "M": M}
 
@@ -72,5 +72,5 @@ if __name__ == '__main__':
                 csvfile.flush()
     sorted_results = sorted(results, key=lambda pair: pair[0])
     parameters = {k: (v if v is not None else []) for k, v in parameters.items()} 
-    data = [[(val if val is not None else np.nan) for val in row] for row in sorted_results]
+    data = np.array([[(val if val is not None else np.nan) for val in row] for row in sorted_results], dtype=object)
     gc.save_data(data, params=parameters, filename=mode, author='cristel.chandre@cnrs.fr')
