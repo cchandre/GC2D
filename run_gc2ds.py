@@ -47,14 +47,15 @@ def run_one(param):
     step = param if mode == 'step' else default_time_step
     om = param if mode == 'omega' else default_omega 
     sol = gc.integrate(z0, t_eval, timestep=step, omega=om, display=False, solver=solver, extension=True, check_energy=True, projection=projection, tol=1e-10, max_iter=100)
-    print(f"{mode} = {param:.3e}   error = {sol.err / Ntraj}  CPU_time = {int(sol.cpu_time)}s with projection = {sol.projection} and proj_dist = {sol.proj_dist}  ")
-    return {"A": A, "M": M, "Ntraj": Ntraj, "n_max": n_max, "solver": solver, "timesep": sol.step, "omega": om, 
+    print(f"{mode} = {param:.3e} | error = {sol.err / Ntraj} | CPU_time = {int(sol.cpu_time)}s with projection = {sol.projection} and proj_dist = {sol.proj_dist}")
+    return {"A": A, "M": M, "Ntraj": Ntraj, "n_max": n_max, "solver": solver, "timestep": sol.step, "omega": om, 
         "error": sol.err / Ntraj, "cpu_time": sol.cpu_time, "projection": sol.projection, "proj_dist": sol.proj_dist}
 
 if __name__ == '__main__':
     output_file = f"{mode}_results.csv"
-    fieldnames = ['A', 'M', 'Ntraj', 'n_max', 'solver', 'timesep', 'omega', 'error', 'cpu_time', 'projection', 'proj_dist']
-    with mp.Pool(processes=n_process) as pool:
+    fieldnames = ['A', 'M', 'Ntraj', 'n_max', 'solver', 'timestep', 'omega', 'error', 'cpu_time', 'projection', 'proj_dist']
+    num_workers = min(mp.cpu_count(), n_process)
+    with mp.Pool(processes=num_workers) as pool:
         with open(output_file, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
