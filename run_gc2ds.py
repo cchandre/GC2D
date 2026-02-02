@@ -23,10 +23,8 @@ default_omega = None
 projection = 'midpoint'
 
 parameters = {"A": A, "M": M}
-
 gc = GC2Ds(parameters)
 z0 = gc.initial_conditions(Ntraj, kind="random")
-
 t_eval = 2 * np.pi * np.arange(n_max)
 
 ## Computation of the Lyapunov exponent
@@ -38,39 +36,28 @@ t_eval = 2 * np.pi * np.arange(n_max)
 # gc.plot_sol(sol, wrap=True)
 # gc.plot_sol(sol)
 
-# parameters.update({"Ntraj": Ntraj, "n_max": n_max, "solver": solver})
-
 mode = 'step'
 
 if mode == 'omega':
     param_list = np.logspace(-2, 2, n_data)  
-    parameters.update({"mode": mode, "omega": param_list, "timestep": default_time_step})
 elif mode == 'step':
     param_list = np.logspace(-2, 0, n_data)[::-1]  
-    parameters.update({"mode": mode, "omega": default_omega, "timestep": param_list})
-else:
-    raise ValueError("Mode must be 'omega' or 'step'")
 
 def run_one(param):
     step = param if mode == 'step' else default_time_step
     om = param if mode == 'omega' else default_omega 
     sol = gc.integrate(z0, t_eval, timestep=step, omega=om, display=False, solver=solver, extension=True, check_energy=True, projection=projection, tol=1e-10, max_iter=100)
     print(f"{mode} = {param:.3e}   error = {sol.err / Ntraj}  CPU_time = {int(sol.cpu_time)}s with projection = {sol.projection} and proj_dist = {sol.proj_dist}  ")
-    return (sol.step, om, sol.err / Ntraj, sol.cpu_time, sol.projection, sol.proj_dist)
+    return {"A": A, "M": M, "Ntraj": Ntraj, "n_max": n_max, "solver": solver, "timesep": sol.step, "omega": om, 
+        "error": sol.err / Ntraj, "cpu_time": sol.cpu_time, "projection": sol.projection, "proj_dist": sol.proj_dist}
 
 if __name__ == '__main__':
     output_file = f"{mode}_results.csv"
-    results = []
-    headers = ['step', 'omega', 'error', 'cpu_time', 'projection', 'proj_dist']
+    fieldnames = ['A', 'M', 'Ntraj', 'n_max', 'solver', 'timesep', 'omega', 'error', 'cpu_time', 'projection', 'proj_dist']
     with mp.Pool(processes=n_process) as pool:
         with open(output_file, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(headers)
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
             for result in pool.imap_unordered(run_one, param_list):
-                results.append(result)
                 writer.writerow(result)
                 csvfile.flush()
-    sorted_results = sorted(results, key=lambda pair: pair[0])
-    parameters = {k: (v if v is not None else []) for k, v in parameters.items()} 
-    data = np.array([[(val if val is not None else np.nan) for val in row] for row in sorted_results], dtype=object)
-    gc.save_data(data, params=parameters, filename=mode, author='cristel.chandre@cnrs.fr')
