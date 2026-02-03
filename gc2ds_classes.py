@@ -30,53 +30,13 @@ from pyhamsys import HamSys
 import matplotlib.pyplot as plt
 import os
 import time
-import numba
-
-@numba.njit(parallel=True)
-def fast_y_dot(z, phic, nm_0, nm_1, t):
-    n_traj = z.shape[0] // 2
-    M_size = phic.shape[0]
-    x = z[:n_traj]
-    y = z[n_traj:]
-    vx = np.zeros(n_traj)
-    vy = np.zeros(n_traj)
-    for n in numba.prange(n_traj):
-        for i in range(M_size):
-            for j in range(M_size):
-                if phic[i, j] == 0: continue
-                phase = nm_0[i, j] * x[n] + nm_1[i, j] * y[n] - t
-                val = phic[i, j] * (np.cos(phase) + 1j * np.sin(phase))
-                d_phi_x = -(nm_0[i, j] * val).real
-                d_phi_y = -(nm_1[i, j] * val).real
-                vx[n] += d_phi_y
-                vy[n] -= d_phi_x    
-    return np.concatenate((vx, vy))
-
-@numba.njit(parallel=True)
-def fast_k_dot(z, phic, nm_0, nm_1, t):
-    n_traj = z.shape[0] // 2
-    M_size = phic.shape[0]
-    x = z[:n_traj]
-    y = z[n_traj:]
-    total_sum = 0.0
-    for n in numba.prange(n_traj):
-        traj_sum = 0.0
-        for i in range(M_size):
-            for j in range(M_size):
-                if phic[i, j] == 0: continue     
-                phase = nm_0[i, j] * x[n] + nm_1[i, j] * y[n] - t
-                val = phic[i, j].real * np.cos(phase) - phic[i, j].imag * np.sin(phase)
-                traj_sum += val
-        total_sum += traj_sum
-    return total_sum
 
 class GC2Ds(HamSys):
 	def __str__(self) -> str:
 		return f'2D Guiding Center ({self.__class__.__name__}) for turbulent potentials'
 
-	def __init__(self, params, use_numba=False) -> None:
+	def __init__(self, params) -> None:
 		super().__init__(ndof=1.5)
-		self.use_numba = use_numba
 		self.A, self.M = params["A"], params["M"]
 		seed = params["seed"] if "seed" in params else 27
 		np.random.seed(seed)
@@ -109,19 +69,13 @@ class GC2Ds(HamSys):
 		return np.exp(1j * (np.einsum('ijk,i...->jk...', self.nm, np.split(z, 2), optimize=True) - t))
 
 	def y_dot(self, t, z):
-		if self.use_numba:
-			return fast_y_dot(z, self.phic, self.nm[0], self.nm[1], t)
-		else:
-			exp_xy = self.compute_exp(t, z)
-			d1phi = np.einsum('ijk,jk...->i...', self.d1phic, exp_xy).real
-			return np.concatenate((-d1phi[1], d1phi[0]), axis=None)
+		exp_xy = self.compute_exp(t, z)
+		d1phi = np.einsum('ijk,jk...->i...', self.d1phic, exp_xy).real
+		return np.concatenate((-d1phi[1], d1phi[0]), axis=None)
 	
 	def k_dot(self, t, z):
-		if self.use_numba:
-			return fast_k_dot(z, self.phic, self.nm[0], self.nm[1], t)
-		else:
-			exp_xy = self.compute_exp(t, z)
-			return np.sum(np.einsum('jk,jk...->...', self.phic, exp_xy).real)
+		exp_xy = self.compute_exp(t, z)
+		return np.sum(np.einsum('jk,jk...->...', self.phic, exp_xy).real)
 
 	def potential(self, t, z, dx=0, dy=0):
 		exp_xy = self.compute_exp(t, z)
