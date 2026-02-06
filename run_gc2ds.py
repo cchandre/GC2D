@@ -6,24 +6,24 @@ import numpy as np
 import multiprocessing as mp
 import csv
 from gc2ds_classes import GC2Ds
+from pyhamsys import Parameters
 
 ## Parameters
 A = 0.6
 M = 25
 
-Ntraj = 500
-n_max = 500
+Ntraj = 10
+n_max = 50
 
 n_data = 200
 n_process = 100
 
-default_time_step = 0.1
-solver = 'RK45'
+default_step = 0.1
+solver = 'BM4'
 default_omega = None
 projection = None
 
-parameters = {"A": A, "M": M}
-gc = GC2Ds(parameters)
+gc = GC2Ds({"A": A, "M": M})
 z0 = gc.initial_conditions(Ntraj, kind="random")
 t_eval = 2 * np.pi * np.arange(n_max)
 
@@ -44,12 +44,9 @@ elif mode == 'step':
     param_list = np.logspace(-2, 0, n_data)[::-1]  
 
 def run_one(param):
-    step = param if mode == 'step' else default_time_step
+    step = param if mode == 'step' else default_step
     om = param if mode == 'omega' else default_omega 
-    sol = gc.integrate(z0, t_eval, timestep=step, omega=om, display=False, solver=solver, extension=True, check_energy=True, projection=projection, tol=1e+10, max_iter=100)
-    if not hasattr(sol, 'projection'):
-        sol.projection = None
-        sol.proj_dist = None
+    sol = gc.integrate(z0, t_eval, params=Parameters(step=step, omega=om, display=True, solver=solver, extension=True, check_energy=True, projection=projection, tol=1e+10, max_iter=100))
     return {"A": A, "M": M, "Ntraj": Ntraj, "n_max": n_max, "solver": solver, "timestep": sol.step, "omega": om, 
         "error": sol.err / Ntraj, "cpu_time": sol.cpu_time, "projection": sol.projection, "proj_dist": sol.proj_dist}
 
