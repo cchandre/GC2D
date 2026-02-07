@@ -1,9 +1,7 @@
 ###################################################################################################
 ##                      Parameters: https://github.com/cchandre/GC2D                             ##
 ###################################################################################################
-
 import numpy as np
-import csv
 from gc2ds_classes import GC2Ds
 from pyhamsys import Parameters
 
@@ -11,11 +9,8 @@ from pyhamsys import Parameters
 A = 0.6
 M = 25
 
-Ntraj = 10
-n_max = 50
-
-n_data = 200
-n_process = 100
+Ntraj = 25
+n_max = 5000
 
 params = Parameters(
     step=0.1,
@@ -37,4 +32,4 @@ val_h = np.array([gc.hamiltonian(t, y) for t, y in zip(sol.t, sol.y.T)]) + sol.k
 
 energy_vs_time = val_h - val_h[0]
 
-gc.save_data(params=params, filename="energy_vs_time", h=energy_vs_time)
+gc.save_data(filename="energy_vs_time" + params.solver, h=energy_vs_time, t=sol.t)

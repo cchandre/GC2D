@@ -2,3 +2,4 @@
 test*.py
 .DS_Store
 __pycache__/
+*.mat
