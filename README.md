@@ -5,7 +5,7 @@ ___
 
 - [`gc2ds_classes.py`](https://github.com/cchandre/GC2D/blob/main/gc2ds_classes.py): contains the GC classes and main functions defining the GC dynamics
 
-- [`run_gc2ds.py`](https://github.com/cchandre/GC2D/blob/main/run_gc2ds.py): example of a run file to reproduce the computations done in [[Mauger, Chandre (2025)]()]
+- [`run_gc2ds.py`](https://github.com/cchandre/GC2D/blob/main/run_gc2ds.py): example of a run file to reproduce the computations done in [[Mauger, Chandre (2026)]()]
 
 Once [`run_gc2ds.py`](https://github.com/cchandre/GC2D/blob/main/run_gc2ds.py) has been edited with the relevant parameters, run the file as 
 ```sh
