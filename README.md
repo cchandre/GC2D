@@ -81,16 +81,16 @@ z0 = gc.initial_conditions(100, x=(0, np.pi), y=(0, np.pi), type="fixed")
 
 ### Reference
 
-F. Mauger, C. Chandre, *Extended phase-space symplectic integration for electron dynamics* (2025)
+F. Mauger, C. Chandre, *Extended phase-space symplectic integration for electron dynamics*, Physical Review E, to appear (2026)
 
 ```bibtex
 @article{GC2Ds,
   title = {Extended phase-space symplectic integration for electron dynamics},
   author = {François Mauger and Cristel Chandre},
-  journal = {},
+  journal = {Physical Review E},
   volume = {},
-  pages = {},
-  year = {2025},
+  pages = {to appear},
+  year = {2026},
   doi = {},
 }
 ```
